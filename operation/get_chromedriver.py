@@ -40,15 +40,18 @@ def do(program_path):
         return False
 
 
-def get_download_version(current_version):
+    def get_download_version(chrome_version):
     """
     根据本地Chrome版本号获取可下载的ChromeDriver版本号
-    :param current_version: 当前本地Chrome版本号前三位
+    :param chrome_version: 当前本地Chrome版本号前三位
     :return: 完整版本号
     """
     google_api_url = 'https://registry.npmmirror.com/-/binary/chromedriver/'
     rep = loads(get(google_api_url).content.decode('utf-8'))
-    version_list = []
+    df = pd.DataFrame.from_dict(rep).sort_values(by = 'modified',ascending=False)
+    one = df.loc[df['name'].str.contains(chrome_version)].sort_values(by='modified',ascending=False).head(1)
+    download_version = one['name'].values[0][:-1]
+    return download_version
 
     for item in rep:
         if item['date'] == '-' and len(item['name']) > 5 and r'[a-zA-Z]':
